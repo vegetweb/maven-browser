@@ -1,0 +1,17 @@
+FROM maven:3-jdk-8
+
+RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
+RUN apt-get -y update && apt-get -y install xvfb iceweasel google-chrome-stable
+
+ENV DISPLAY :99
+
+# Install Xvfb init script
+ADD xvfb_init /etc/init.d/xvfb
+RUN chmod a+x /etc/init.d/xvfb
+ADD xvfb-daemon-run /usr/bin/xvfb-daemon-run
+RUN chmod a+x /usr/bin/xvfb-daemon-run
+
+# Allow root to execute Google Chrome by replacing launch script
+ADD google-chrome-launcher /usr/bin/google-chrome
+RUN chmod a+x /usr/bin/google-chrome
